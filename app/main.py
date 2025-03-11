@@ -3,6 +3,7 @@ from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel 
 from random import randrange 
+import uvicorn 
 
 app = FastAPI()
 
@@ -55,7 +56,7 @@ def get_post(id : int, response : Response):
                             detail=f"Post with {id} was not found")
     return {"post_detail" : post }
 
- 
+
 @app.delete ("/posts/{id}", status_code= status.HTTP_204_NO_CONTENT)
 def Delete_post(id : int, ):
     index = find_index_post(id)
@@ -71,9 +72,24 @@ def update_post(id : int, post: Post):
     if index == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Post with {id} does not exsist")
-     
+
     post_dict = post.dict() 
     post_dict['id'] = id
     my_posts[index] = post_dict
     return {"data" : post_dict}
- 
+
+def start_server():
+    print('Starting Server...')       
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8765,
+        log_level="debug",
+        reload=True,
+    )
+
+# To run the FastAPI app
+if __name__ == "__main__":
+    start_server()
+    
